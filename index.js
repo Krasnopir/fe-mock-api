@@ -49,7 +49,7 @@ const orders = Array.from({ length: 120 }).map(() => ({
     id: faker.string.uuid(),
     name: faker.commerce.productName()
   },
-  price: parseFloat(faker.commerce.price({ min: 10, max: 1000 }))
+  price: faker.number.int({ min: 100, max: 10000 })
 }));
 
 // Сортируем от новых к старым
