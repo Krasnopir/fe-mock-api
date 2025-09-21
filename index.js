@@ -4,11 +4,14 @@ import { faker } from "@faker-js/faker";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const AUTH_TOKEN = "SECRET_TOKEN";
+const AUTH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImQ2M2QyYjNmOTE0NjdlZDE4MTBlYmZlZjBlZmJhMjFjIn0.eyJpZCI6ImQ5MjI0MGUzLTc4OWItNGM4NS05OWVkLTY4N2Q2NWRmN2RmZCJ9.2AWJAapQ3jheVjyNIFQvTHg9QytCgzzY4JkcirzmDAMMsEKmXcnyE2nSVYySez3Qxh3bahoJLKKM_zT3WJummg";
+
+// 🔹 Константный uuid
+const CLIENT_UUID = "11111111-2222-3333-4444-555555555555";
 
 // 🔹 Middleware для авторизации
 app.use((req, res, next) => {
-  if (req.path.startsWith("/me") || req.path.startsWith("/orders")) {
+  if (req.path.startsWith("/api")) {
     const auth = req.headers.authorization;
     if (auth !== `Bearer ${AUTH_TOKEN}`) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -17,13 +20,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔹 Эндпоинт пользователя
-app.get("/me", (req, res) => {
+const sleep = (timeout) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+
+// 🔹 Эндпоинт self
+app.get("/api/self", async (req, res) => {
+  await sleep(200);
+
   res.json({
-    id: 1,
-    name: "Test User",
-    email: "test@example.com",
-    role: "candidate"
+    id: CLIENT_UUID,
+    firstName: "John",
+    lastName: "Doe",
   });
 });
 
@@ -42,7 +51,9 @@ const orders = Array.from({ length: 120 }).map((_, i) => ({
 orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
 // 🔹 Эндпоинт заказов
-app.get("/orders", (req, res) => {
+app.get("/api/orders", async (req, res) => {
+  await sleep(300);
+
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
 
